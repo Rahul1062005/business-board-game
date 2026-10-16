@@ -240,14 +240,14 @@ export const Board: React.FC<BoardProps> = ({
 
           {/* Diagonal Card Slots */}
           <div className="card-slot community-chest-slot">
-            <div className="slot-title">BHARAT SAMACHAR</div>
-            <div className="slot-subtitle">COMMUNITY CHEST</div>
+            <div className="slot-title">COMMUNITY CHEST</div>
+            <div className="slot-subtitle">FOLLOW INSTRUCTIONS ON TOP CARD</div>
             <div className="slot-icon">📦</div>
           </div>
 
           <div className="card-slot chance-slot">
-            <div className="slot-title">BHARAT KHAZANA</div>
-            <div className="slot-subtitle">CHANCE</div>
+            <div className="slot-title">CHANCE</div>
+            <div className="slot-subtitle">FOLLOW INSTRUCTIONS ON TOP CARD</div>
             <div className="slot-icon">❓</div>
           </div>
 

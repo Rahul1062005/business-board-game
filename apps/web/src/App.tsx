@@ -51,6 +51,14 @@ export const App: React.FC = () => {
   const [isRolling, setIsRolling] = useState<boolean>(false);
   const [isWalking, setIsWalking] = useState<boolean>(false);
   const [hoppingPlayerId, setHoppingPlayerId] = useState<string | null>(null);
+  const [tableTheme, setTableTheme] = useState<'wood' | 'emerald' | 'midnight'>(() => {
+    return (localStorage.getItem('business_table_theme') as any) || 'wood';
+  });
+
+  useEffect(() => {
+    document.body.className = `theme-${tableTheme}`;
+    localStorage.setItem('business_table_theme', tableTheme);
+  }, [tableTheme]);
 
   // Synchronize displayPositions when gameState changes outside of walking
   useEffect(() => {
@@ -278,6 +286,16 @@ export const App: React.FC = () => {
         </div>
 
         <div className="header-stats">
+          <select
+            className="theme-selector-dropdown"
+            value={tableTheme}
+            onChange={(e) => setTableTheme(e.target.value as any)}
+            title="Change Tabletop Background"
+          >
+            <option value="wood">🪵 Luxury Walnut Table</option>
+            <option value="emerald">♠️ Casino Emerald Felt</option>
+            <option value="midnight">🌌 Midnight High-Roller</option>
+          </select>
           <button
             className="btn-secondary"
             onClick={() => setShowRulesModal(true)}
