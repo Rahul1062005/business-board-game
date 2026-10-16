@@ -78,12 +78,12 @@ describe('Business Game Engine — Rules & Transitions', () => {
       players: initialPlayers,
     });
 
-    // Old Delhi category has space-1 (Chandni Chowk, base rent 4) and space-3 (Daryaganj, base rent 6)
+    // Punjab category has space-1 (Amritsar, base rent 2) and space-3 (Ludhiana, base rent 4)
     state.properties['space-1'].ownerId = 'player-1';
     state.properties['space-3'].ownerId = 'player-1';
 
     const rentWithSet = calculateRent(state, 'space-1', 7);
-    expect(rentWithSet).toBe(8); // 4 * 2 = 8
+    expect(rentWithSet).toBe(4); // 2 * 2 = 4
 
     // If one is mortgaged, rent on the other is still standard/calculated, mortgaged one earns 0
     state.properties['space-1'].isMortgaged = true;
@@ -234,7 +234,7 @@ describe('Business Game Engine — Rules & Transitions', () => {
     state.properties['space-3'].isMortgaged = true;
 
     const nw = calculatePlayerNetWorth(state, 'player-1');
-    // Cash: 1000 + Unmortgaged: 60 + Mortgaged 50%: 40 + Upgrades 50%: 25 = 1125
-    expect(nw.totalNetWorth).toBe(1000 + 60 + 40 + 25);
+    // Cash: 1000 + Unmortgaged: 60 + Mortgaged 50%: 30 + Upgrades 50%: 25 = 1115
+    expect(nw.totalNetWorth).toBe(1000 + 60 + 30 + 25);
   });
 });

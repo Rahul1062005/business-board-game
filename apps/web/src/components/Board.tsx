@@ -1,247 +1,343 @@
 import React from 'react';
-import { GameState, BoardSpace, Player } from '@business/shared-types';
+import { GameState, BoardSpace } from '@business/shared-types';
 import { BOARD_SPACES } from '@business/game-content';
+import { Dice3D } from './Dice3D.js';
 
 interface BoardProps {
   state: GameState;
+  displayPositions: Record<string, number>; // Animated display position of each player
+  hoppingPlayerId: string | null;
   onSelectSpace: (space: BoardSpace) => void;
   onRollDice: () => void;
   onEndTurn: () => void;
   onBuyProperty: () => void;
   onDeclineProperty: () => void;
   isRolling: boolean;
+  isWalking: boolean;
 }
 
-export function getTileGridPosition(index: number): { gridColumn: number; gridRow: number } {
-  if (index === 0) return { gridColumn: 10, gridRow: 10 };
-  if (index >= 1 && index <= 8) return { gridColumn: 10 - index, gridRow: 10 };
-  if (index === 9) return { gridColumn: 1, gridRow: 10 };
-  if (index >= 10 && index <= 17) return { gridColumn: 1, gridRow: 10 - (index - 9) };
-  if (index === 18) return { gridColumn: 1, gridRow: 1 };
-  if (index >= 19 && index <= 26) return { gridColumn: 1 + (index - 18), gridRow: 1 };
-  if (index === 27) return { gridColumn: 10, gridRow: 1 };
-  if (index >= 28 && index <= 35) return { gridColumn: 10, gridRow: 1 + (index - 27) };
-  return { gridColumn: 1, gridRow: 1 };
+export function getTileGridPosition40(index: number): {
+  gridColumn: number;
+  gridRow: number;
+  orientation: 'bottom' | 'left' | 'top' | 'right' | 'corner';
+} {
+  // 40 spaces in an 11x11 grid:
+  // 0: Bottom-Right Corner (GO)
+  if (index === 0) return { gridColumn: 11, gridRow: 11, orientation: 'corner' };
+
+  // 1 to 9: Bottom Row (Right to Left)
+  if (index >= 1 && index <= 9) {
+    return { gridColumn: 11 - index, gridRow: 11, orientation: 'bottom' };
+  }
+
+  // 10: Bottom-Left Corner (JAIL)
+  if (index === 10) return { gridColumn: 1, gridRow: 11, orientation: 'corner' };
+
+  // 11 to 19: Left Column (Bottom to Top)
+  if (index >= 11 && index <= 19) {
+    return { gridColumn: 1, gridRow: 11 - (index - 10), orientation: 'left' };
+  }
+
+  // 20: Top-Left Corner (FREE PARKING)
+  if (index === 20) return { gridColumn: 1, gridRow: 1, orientation: 'corner' };
+
+  // 21 to 29: Top Row (Left to Right)
+  if (index >= 21 && index <= 29) {
+    return { gridColumn: 1 + (index - 20), gridRow: 1, orientation: 'top' };
+  }
+
+  // 30: Top-Right Corner (GO TO JAIL)
+  if (index === 30) return { gridColumn: 11, gridRow: 1, orientation: 'corner' };
+
+  // 31 to 39: Right Column (Top to Bottom)
+  if (index >= 31 && index <= 39) {
+    return { gridColumn: 11, gridRow: 1 + (index - 30), orientation: 'right' };
+  }
+
+  return { gridColumn: 1, gridRow: 1, orientation: 'corner' };
 }
 
 export const Board: React.FC<BoardProps> = ({
   state,
+  displayPositions,
+  hoppingPlayerId,
   onSelectSpace,
   onRollDice,
   onEndTurn,
   onBuyProperty,
   onDeclineProperty,
   isRolling,
+  isWalking,
 }) => {
   const activePlayer = state.players[state.activePlayerIndex];
   const activeSpace = BOARD_SPACES[activePlayer.position];
-  const activePropState = state.properties[activeSpace.id];
 
   return (
-    <div className="board-arena-container">
-      <div className="board-wrapper">
-        {/* Render the 36 Spaces */}
+    <div className="classic-board-container">
+      <div className="classic-board-wrapper">
+        {/* Render all 40 tiles */}
         {BOARD_SPACES.map((space) => {
-          const { gridColumn, gridRow } = getTileGridPosition(space.index);
-          const isCorner = space.index % 9 === 0;
+          const { gridColumn, gridRow, orientation } = getTileGridPosition40(space.index);
+          const isCorner = space.index % 10 === 0;
           const propState = state.properties[space.id];
           const owner = propState?.ownerId
             ? state.players.find((p) => p.id === propState.ownerId)
             : null;
 
-          // Find players currently on this space
+          // Find players currently on this space (using animated displayPositions)
           const playersHere = state.players.filter(
-            (p) => !p.isBankrupt && p.position === space.index
+            (p) => !p.isBankrupt && (displayPositions[p.id] ?? p.position) === space.index
           );
 
           return (
             <div
               key={space.id}
-              className={`space-tile ${isCorner ? 'is-corner' : ''}`}
+              className={`classic-tile tile-${orientation} ${isCorner ? `tile-corner corner-${space.index}` : ''}`}
               style={{
                 gridColumn,
                 gridRow,
-                borderTop: isCorner ? undefined : space.categoryColor ? `4px solid ${space.categoryColor}` : undefined,
               }}
               onClick={() => onSelectSpace(space)}
               title={`${space.name} ${space.price ? `— ₹${space.price}` : ''}`}
             >
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-                <span style={{ fontSize: isCorner ? '20px' : '14px', marginBottom: '2px' }}>
-                  {space.icon || '📍'}
-                </span>
-                <span className="space-name">{space.name}</span>
-                {space.hindiName && (
-                  <span style={{ fontSize: '0.58rem', color: '#94a3b8', textAlign: 'center' }}>
-                    {space.hindiName.split(' ')[0]}
-                  </span>
-                )}
-              </div>
-
-              {/* Price / Type Info */}
-              {space.price != null && (
-                <div className="space-price">
-                  ₹{space.price}
+              {/* Corner Custom Graphics */}
+              {space.index === 0 && (
+                <div className="corner-content corner-go">
+                  <div className="go-salary">COLLECT ₹200 SALARY AS YOU PASS</div>
+                  <div className="go-title">GO</div>
+                  <div className="go-arrow">⮜</div>
                 </div>
               )}
 
-              {/* Owner Indicator badge */}
-              {owner && (
-                <div
-                  className="space-owner-tag"
-                  style={{ backgroundColor: owner.color }}
-                  title={`Owned by ${owner.name}`}
-                />
-              )}
-
-              {/* Upgrades or Flagship Indicator */}
-              {propState && propState.upgradeLevel > 0 && (
-                <div className="space-upgrade-badges">
-                  {propState.upgradeLevel === 5 ? (
-                    <span style={{ fontSize: '10px' }} title="Flagship Business">👑</span>
-                  ) : (
-                    Array.from({ length: propState.upgradeLevel }).map((_, i) => (
-                      <span key={i} className="upgrade-star">⭐</span>
-                    ))
-                  )}
+              {space.index === 10 && (
+                <div className="corner-content corner-jail">
+                  <div className="jail-strip-top">JUST</div>
+                  <div className="jail-cell">
+                    <span className="jail-bars">⛓️</span>
+                    <span className="jail-text">IN JAIL</span>
+                  </div>
+                  <div className="jail-strip-right">VISITING</div>
                 </div>
               )}
 
-              {/* Mortgaged tag */}
-              {propState?.isMortgaged && (
-                <div style={{ position: 'absolute', inset: 0, background: 'rgba(239, 68, 68, 0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '9px', fontWeight: 800, color: 'white' }}>
-                  MORTGAGED
+              {space.index === 20 && (
+                <div className="corner-content corner-parking">
+                  <div className="parking-top">FREE</div>
+                  <div className="parking-car">🚗</div>
+                  <div className="parking-bottom">PARKING</div>
                 </div>
               )}
 
-              {/* Player Pawns / Tokens on this Space */}
-              {playersHere.length > 0 && (
-                <div className="player-tokens-container">
-                  {playersHere.map((p) => (
+              {space.index === 30 && (
+                <div className="corner-content corner-gotojail">
+                  <div className="gotojail-title">GO TO</div>
+                  <div className="gotojail-cop">👮‍♂️👉</div>
+                  <div className="gotojail-title">JAIL</div>
+                </div>
+              )}
+
+              {/* Regular Edge Spaces */}
+              {!isCorner && (
+                <>
+                  {/* Colored Property Bar (Matches standard placement based on orientation) */}
+                  {space.categoryColor && (
                     <div
-                      key={p.id}
-                      className="player-token-pin"
-                      style={{
-                        backgroundColor: p.color,
-                        border: p.id === activePlayer.id ? '2px solid #fbbf24' : '2px solid white',
-                        transform: p.id === activePlayer.id ? 'scale(1.2)' : 'scale(1)',
-                        zIndex: p.id === activePlayer.id ? 10 : 2,
-                      }}
-                      title={`${p.name} (${p.token})`}
-                    >
-                      {p.token === 'auto-rickshaw' && '🛺'}
-                      {p.token === 'chai-cup' && '☕'}
-                      {p.token === 'peacock' && '🦚'}
-                      {p.token === 'cricket-bat' && '🏏'}
-                      {p.token === 'royal-elephant' && '🐘'}
-                      {p.token === 'tiger' && '🐅'}
-                    </div>
-                  ))}
+                      className={`tile-color-bar bar-${orientation}`}
+                      style={{ backgroundColor: space.categoryColor }}
+                    />
+                  )}
+
+                  <div className="tile-content">
+                    {/* Icon for non-property spaces (Railroads, Utilities, Cards, Taxes) */}
+                    {space.icon && !space.categoryColor && (
+                      <div className="tile-icon">{space.icon}</div>
+                    )}
+
+                    <div className="tile-name">{space.name}</div>
+
+                    {space.category && (
+                      <div className="tile-category-tag">
+                        {space.category.replace('_', ' ').toUpperCase()}
+                      </div>
+                    )}
+
+                    {space.price != null && (
+                      <div className="tile-price">₹{space.price}</div>
+                    )}
+
+                    {space.taxAmount != null && (
+                      <div className="tile-price">PAY ₹{space.taxAmount}</div>
+                    )}
+
+                    {/* Ownership Flag */}
+                    {owner && (
+                      <div
+                        className="tile-owner-indicator"
+                        style={{ backgroundColor: owner.color }}
+                        title={`Owned by ${owner.name}`}
+                      />
+                    )}
+
+                    {/* Upgrades Stars or Flagship Crown */}
+                    {propState && propState.upgradeLevel > 0 && (
+                      <div className="tile-upgrade-icons">
+                        {propState.upgradeLevel === 5 ? (
+                          <span className="flagship-crown" title="Flagship Business">👑</span>
+                        ) : (
+                          Array.from({ length: propState.upgradeLevel }).map((_, i) => (
+                            <span key={i} className="upgrade-house">🏠</span>
+                          ))
+                        )}
+                      </div>
+                    )}
+
+                    {/* Mortgaged Overlay */}
+                    {propState?.isMortgaged && (
+                      <div className="mortgaged-banner">MORTGAGED</div>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {/* Player Pawns / Avatars on this tile */}
+              {playersHere.length > 0 && (
+                <div className="tile-pawns-container">
+                  {playersHere.map((p) => {
+                    const isHopping = hoppingPlayerId === p.id;
+                    return (
+                      <div
+                        key={p.id}
+                        className={`board-pawn ${isHopping ? 'is-hopping' : ''} ${p.id === activePlayer.id ? 'is-active-player' : ''}`}
+                        style={{
+                          backgroundColor: p.color,
+                        }}
+                        title={`${p.name} (${p.token})`}
+                      >
+                        {p.token === 'auto-rickshaw' && '🛺'}
+                        {p.token === 'chai-cup' && '☕'}
+                        {p.token === 'peacock' && '🦚'}
+                        {p.token === 'cricket-bat' && '🏏'}
+                        {p.token === 'royal-elephant' && '🐘'}
+                        {p.token === 'tiger' && '🐅'}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
           );
         })}
 
-        {/* Center of the Board: Active Turn Hub & Controls */}
-        <div className="board-center-hub">
-          <div className="center-emblem">व्यापार</div>
+        {/* Center Board Area: Classic Red Angled Banner & 3D Dice Tray */}
+        <div className="classic-center-board">
+          {/* Classic Angled Red Logo Box (Like the MONOPOLY box in reference image) */}
+          <div className="classic-red-banner">
+            <div className="banner-inner">
+              <span className="banner-title">BUSINESS</span>
+              <span className="banner-subtitle">INDIAN PROPERTY TRADING BOARD GAME</span>
+            </div>
+          </div>
 
-          {/* Active Player Status Banner */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              padding: '8px 18px',
-              borderRadius: '24px',
-              background: 'rgba(255, 255, 255, 0.08)',
-              border: `2px solid ${activePlayer.color}`,
-              boxShadow: `0 0 16px ${activePlayer.color}40`,
-            }}
-          >
-            <div
-              style={{
-                width: '14px',
-                height: '14px',
-                borderRadius: '50%',
-                backgroundColor: activePlayer.color,
-              }}
+          {/* Diagonal Card Slots */}
+          <div className="card-slot community-chest-slot">
+            <div className="slot-title">BHARAT SAMACHAR</div>
+            <div className="slot-subtitle">COMMUNITY CHEST</div>
+            <div className="slot-icon">📦</div>
+          </div>
+
+          <div className="card-slot chance-slot">
+            <div className="slot-title">BHARAT KHAZANA</div>
+            <div className="slot-subtitle">CHANCE</div>
+            <div className="slot-icon">❓</div>
+          </div>
+
+          {/* 3D Dice Area in Center */}
+          <div className="center-dice-stage">
+            <Dice3D
+              dice={state.lastDiceRoll}
+              isRolling={isRolling}
             />
-            <span style={{ fontWeight: 800, fontSize: '1.05rem', color: '#f8fafc' }}>
-              {activePlayer.name}'s Turn
-            </span>
-            <span style={{ fontSize: '0.85rem', color: '#fbbf24', fontWeight: 700 }}>
-              ₹{activePlayer.cash}
-            </span>
-          </div>
 
-          {/* Dice Box */}
-          <div className="dice-container">
-            <div className={`dice-die ${isRolling ? 'rolling' : ''}`}>
-              {state.lastDiceRoll ? state.lastDiceRoll[0] : '6'}
-            </div>
-            <div className={`dice-die ${isRolling ? 'rolling' : ''}`}>
-              {state.lastDiceRoll ? state.lastDiceRoll[1] : '3'}
-            </div>
-          </div>
-
-          {/* Event Card notification banner if just drawn */}
-          {state.currentEventCard && (
-            <div
-              style={{
-                background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(239, 68, 68, 0.2))',
-                border: '1px solid rgba(245, 158, 11, 0.4)',
-                borderRadius: '12px',
-                padding: '10px 16px',
-                maxWidth: '380px',
-              }}
-            >
-              <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase' }}>
-                ✨ {state.currentEventCard.title}
-              </div>
-              <div style={{ fontSize: '0.78rem', color: '#e2e8f0', marginTop: '4px' }}>
-                {state.currentEventCard.description}
-              </div>
-            </div>
-          )}
-
-          {/* Turn Action Buttons */}
-          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'center' }}>
-            {state.phase === 'waiting_for_roll' && (
-              <button
-                className="btn-primary"
-                onClick={onRollDice}
-                disabled={isRolling}
-                style={{ fontSize: '1rem', padding: '12px 28px' }}
+            {/* Turn Status & Controls */}
+            <div className="turn-action-bar">
+              <div
+                className="active-player-pill"
+                style={{ borderColor: activePlayer.color }}
               >
-                🎲 Roll Dice
-              </button>
-            )}
-
-            {state.phase === 'buying_decision' && (
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button
-                  className="btn-primary"
-                  onClick={onBuyProperty}
-                  disabled={activePlayer.cash < (activeSpace.price || 0)}
+                <div
+                  className="player-avatar-circle"
+                  style={{ backgroundColor: activePlayer.color }}
                 >
-                  Buy {activeSpace.name} (₹{activeSpace.price})
-                </button>
-                <button className="btn-secondary" onClick={onDeclineProperty}>
-                  Pass / Skip
-                </button>
+                  {activePlayer.token === 'auto-rickshaw' && '🛺'}
+                  {activePlayer.token === 'chai-cup' && '☕'}
+                  {activePlayer.token === 'peacock' && '🦚'}
+                  {activePlayer.token === 'cricket-bat' && '🏏'}
+                  {activePlayer.token === 'royal-elephant' && '🐘'}
+                  {activePlayer.token === 'tiger' && '🐅'}
+                </div>
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{ fontWeight: 800, fontSize: '0.95rem', color: '#1e293b' }}>
+                    {activePlayer.name}'s Turn
+                  </div>
+                  <div style={{ fontSize: '0.8rem', color: '#047857', fontWeight: 800 }}>
+                    ₹{activePlayer.cash}
+                  </div>
+                </div>
               </div>
-            )}
 
-            {state.phase === 'action_phase' && (
-              <button
-                className="btn-primary"
-                onClick={onEndTurn}
-                style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', boxShadow: '0 4px 15px rgba(16, 185, 129, 0.35)' }}
-              >
-                ✓ End Turn
-              </button>
+              {/* Action Buttons */}
+              {state.phase === 'waiting_for_roll' && (
+                <button
+                  className="btn-classic-primary"
+                  onClick={onRollDice}
+                  disabled={isRolling || isWalking}
+                >
+                  🎲 Roll Dice
+                </button>
+              )}
+
+              {isWalking && (
+                <div className="walking-indicator">
+                  🚶 Moving {activePlayer.name}...
+                </div>
+              )}
+
+              {state.phase === 'buying_decision' && !isWalking && (
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <button
+                    className="btn-classic-primary"
+                    onClick={onBuyProperty}
+                    disabled={activePlayer.cash < (activeSpace.price || 0)}
+                  >
+                    Buy {activeSpace.name} (₹{activeSpace.price})
+                  </button>
+                  <button className="btn-classic-secondary" onClick={onDeclineProperty}>
+                    Pass
+                  </button>
+                </div>
+              )}
+
+              {state.phase === 'action_phase' && !isWalking && (
+                <button
+                  className="btn-classic-primary"
+                  onClick={onEndTurn}
+                  style={{ background: '#059669', borderColor: '#047857' }}
+                >
+                  ✓ End Turn
+                </button>
+              )}
+            </div>
+
+            {/* Event Card Banner if drawn */}
+            {state.currentEventCard && !isWalking && (
+              <div className="center-event-card-alert">
+                <div className="card-alert-header">
+                  ✨ {state.currentEventCard.title}
+                </div>
+                <div className="card-alert-desc">
+                  {state.currentEventCard.description}
+                </div>
+              </div>
             )}
           </div>
         </div>

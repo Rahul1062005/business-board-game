@@ -196,11 +196,11 @@ export function applyGameAction(
       if (isDoubles) {
         state.doublesCount += 1;
         if (state.doublesCount >= 3) {
-          activePlayer.position = 9;
+          activePlayer.position = 10;
           activePlayer.inDetention = true;
           activePlayer.detentionTurns = 0;
           state.doublesCount = 0;
-          addLog(state, 'move', `Three consecutive doubles! ${activePlayer.name} was sent directly to Detention!`, activePlayer.id);
+          addLog(state, 'move', `Three consecutive doubles! ${activePlayer.name} was sent directly to Jail!`, activePlayer.id);
           state.phase = 'action_phase';
           return { state };
         }
@@ -503,14 +503,14 @@ function moveAndResolveSpace(
   rng: SeededRNG
 ): { state: GameState; error?: string } {
   const oldPos = player.position;
-  const newPos = (oldPos + steps) % 36;
+  const newPos = (oldPos + steps) % 40;
 
   if (newPos < oldPos && newPos !== 0) {
     player.cash += state.settings.goReward;
-    addLog(state, 'move', `${player.name} passed Prarambh (Start) and collected ₹${state.settings.goReward}.`, player.id);
+    addLog(state, 'move', `${player.name} passed GO and collected ₹${state.settings.goReward}.`, player.id);
   } else if (newPos === 0) {
     player.cash += state.settings.goReward;
-    addLog(state, 'move', `${player.name} landed on Prarambh (Start) and collected ₹${state.settings.goReward}.`, player.id);
+    addLog(state, 'move', `${player.name} landed on GO and collected ₹${state.settings.goReward}.`, player.id);
   }
 
   player.position = newPos;
@@ -531,10 +531,10 @@ function moveAndResolveSpace(
     }
 
     case 'goToDetention': {
-      player.position = 9;
+      player.position = 10;
       player.inDetention = true;
       player.detentionTurns = 0;
-      addLog(state, 'move', `Court Order! ${player.name} was sent directly to Detention!`, player.id);
+      addLog(state, 'move', `Go To Jail! ${player.name} was sent directly to Jail!`, player.id);
       state.phase = 'action_phase';
       return { state };
     }
@@ -685,8 +685,9 @@ function applyEventCard(
 
     case 'move_to': {
       const targetPos = card.targetPosition ?? 0;
-      if (targetPos === 9) {
-        player.position = 9;
+      if (targetPos === 10) {
+        // Detention / Jail
+        player.position = 10;
         player.inDetention = true;
         player.detentionTurns = 0;
       } else {

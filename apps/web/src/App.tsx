@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   GameState,
   BoardSpace,
@@ -28,11 +28,20 @@ export const App: React.FC = () => {
     return createInitialGameState({
       mode: 'classic',
       players: [
-        { name: 'Rahul', token: 'auto-rickshaw', color: '#3b82f6' },
-        { name: 'Priya', token: 'chai-cup', color: '#ef4444' },
-        { name: 'Amit', token: 'peacock', color: '#10b981' },
+        { name: 'Rahul', token: 'auto-rickshaw', color: '#dc2626' }, // Classic Red
+        { name: 'Priya', token: 'chai-cup', color: '#2563eb' },      // Classic Blue
+        { name: 'Amit', token: 'peacock', color: '#16a34a' },       // Classic Green
       ],
     });
+  });
+
+  // Animated visual display positions for each player (for walking hops)
+  const [displayPositions, setDisplayPositions] = useState<Record<string, number>>(() => {
+    const initial: Record<string, number> = {};
+    for (const p of gameState.players) {
+      initial[p.id] = p.position;
+    }
+    return initial;
   });
 
   const [selectedSpace, setSelectedSpace] = useState<BoardSpace | null>(null);
@@ -40,24 +49,87 @@ export const App: React.FC = () => {
   const [showNewGameModal, setShowNewGameModal] = useState<boolean>(false);
   const [showRulesModal, setShowRulesModal] = useState<boolean>(false);
   const [isRolling, setIsRolling] = useState<boolean>(false);
+  const [isWalking, setIsWalking] = useState<boolean>(false);
+  const [hoppingPlayerId, setHoppingPlayerId] = useState<string | null>(null);
+
+  // Synchronize displayPositions when gameState changes outside of walking
+  useEffect(() => {
+    if (!isWalking) {
+      setDisplayPositions((prev) => {
+        const next = { ...prev };
+        for (const p of gameState.players) {
+          next[p.id] = p.position;
+        }
+        return next;
+      });
+    }
+  }, [gameState, isWalking]);
 
   // Auto-save game state
   useEffect(() => {
     saveGameState(gameState);
   }, [gameState]);
 
-  // Handle dice rolling with short animation
+  // Roll dice with 3D throw animation followed by space-by-space avatar hopping!
   const handleRollDice = () => {
-    if (gameState.phase !== 'waiting_for_roll' || isRolling) return;
+    if (gameState.phase !== 'waiting_for_roll' || isRolling || isWalking) return;
+
     setIsRolling(true);
 
-    setTimeout(() => {
-      const res = applyGameAction(gameState, { type: 'ROLL_DICE' });
-      if (res.state) {
-        setGameState(res.state);
-      }
+    // Apply the ROLL_DICE action to get the authoritative result
+    const result = applyGameAction(gameState, { type: 'ROLL_DICE' });
+    if (!result.state || !result.state.lastDiceRoll) {
       setIsRolling(false);
-    }, 450);
+      return;
+    }
+
+    const [d1, d2] = result.state.lastDiceRoll;
+    const totalSteps = d1 + d2;
+    const activePlayer = gameState.players[gameState.activePlayerIndex];
+    const startPos = activePlayer.position;
+
+    // Phase 1: 3D Dice tumble and roll on the board (750ms)
+    setTimeout(() => {
+      // Show final dice values
+      setGameState((prev) => ({
+        ...prev,
+        lastDiceRoll: [d1, d2],
+      }));
+      setIsRolling(false);
+
+      // If active player was in detention and didn't roll doubles, no walking needed
+      if (activePlayer.inDetention && d1 !== d2 && activePlayer.detentionTurns < 2) {
+        setGameState(result.state);
+        return;
+      }
+
+      // Phase 2: Avatar hops step-by-step around the board tiles!
+      setIsWalking(true);
+      setHoppingPlayerId(activePlayer.id);
+
+      let stepCount = 0;
+      let currentPos = startPos;
+
+      const walkInterval = setInterval(() => {
+        stepCount += 1;
+        currentPos = (currentPos + 1) % 40;
+
+        setDisplayPositions((prev) => ({
+          ...prev,
+          [activePlayer.id]: currentPos,
+        }));
+
+        if (stepCount >= totalSteps) {
+          clearInterval(walkInterval);
+          setTimeout(() => {
+            setIsWalking(false);
+            setHoppingPlayerId(null);
+            // Apply full authoritative resolved state
+            setGameState(result.state);
+          }, 200);
+        }
+      }, 190); // 190ms per hop
+    }, 750);
   };
 
   const handleBuyProperty = () => {
@@ -196,11 +268,11 @@ export const App: React.FC = () => {
       {/* Top Header */}
       <header className="app-header">
         <div className="header-brand">
-          <div className="header-logo">💼</div>
+          <div className="header-logo">🎩</div>
           <div>
             <h1 className="header-title">BUSINESS</h1>
             <div className="header-subtitle">
-              Bharat Property & Strategy • {gameState.mode === 'quick' ? '⚡ Quick Business' : '🏆 Classic Mode'}
+              Classic Indian Property Trading Game • {gameState.mode === 'quick' ? '⚡ Quick Business' : '🏆 Classic'}
             </div>
           </div>
         </div>
@@ -225,19 +297,22 @@ export const App: React.FC = () => {
 
       {/* Main Board & Players Layout */}
       <div className="game-layout">
-        {/* Left Arena: 36-space board */}
+        {/* Left Arena: 40-space classic Monopoly board with 3D dice */}
         <Board
           state={gameState}
+          displayPositions={displayPositions}
+          hoppingPlayerId={hoppingPlayerId}
           onSelectSpace={(space) => setSelectedSpace(space)}
           onRollDice={handleRollDice}
           onEndTurn={handleEndTurn}
           onBuyProperty={handleBuyProperty}
           onDeclineProperty={handleDeclineProperty}
           isRolling={isRolling}
+          isWalking={isWalking}
         />
 
         {/* Right Sidebar: Players, Assets, & Transaction Feed */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           <div className="glass-panel" style={{ padding: '16px' }}>
             <PlayerPanel
               state={gameState}
