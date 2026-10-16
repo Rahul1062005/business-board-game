@@ -61,11 +61,12 @@ body.theme-midnight {
 .roblox-tabletop-container {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
+  max-height: 100vh;
   position: relative;
   overflow: hidden;
   justify-content: space-between;
-  padding: 12px 18px;
+  padding: 8px 16px;
 }
 
 /* Top Floating HUD Bar (Hourglass timer, Player capsules, sound) */
@@ -88,27 +89,79 @@ body.theme-midnight {
   color: #0f172a;
   border: 2px solid #0f172a;
   border-radius: 12px;
-  padding: 6px 14px;
-  font-size: 1.15rem;
+  padding: 5px 12px;
+  font-size: 1.1rem;
   font-weight: 900;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
 }
 
-.camera-tilt-toggle {
-  background: rgba(0, 0, 0, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  color: white;
-  padding: 6px 12px;
-  border-radius: 10px;
-  font-size: 0.8rem;
-  font-weight: 700;
+/* Camera Angle Controls in Header */
+.camera-controls-group {
   display: flex;
   align-items: center;
-  gap: 6px;
-  backdrop-filter: blur(8px);
+  gap: 8px;
 }
-.camera-tilt-toggle:hover {
+
+.camera-angle-capsule {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(15, 23, 42, 0.88);
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
+  border-radius: 12px;
+  padding: 3px 6px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
+}
+
+.angle-step-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.angle-step-btn:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.angle-display {
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: #38bdf8;
+  padding: 0 4px;
+  min-width: 58px;
+  text-align: center;
+}
+
+.angle-preset-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #cbd5e1;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.angle-preset-btn:hover {
   background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+.angle-preset-btn.is-selected {
+  background: #2563eb;
+  border-color: #60a5fa;
+  color: white;
+  font-weight: 800;
 }
 
 /* Floating Player Capsules in Top Center */
@@ -191,37 +244,43 @@ body.theme-midnight {
   align-items: center;
   width: 100%;
   flex: 1;
-  padding: 10px 0;
+  min-height: 0;
+  padding: 2px 0;
+  position: relative;
+  overflow: visible;
 }
 
 .tabletop-perspective-stage {
-  perspective: 1600px;
-  perspective-origin: 50% 45%;
+  perspective: 1400px;
+  perspective-origin: 50% 36%;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
+  height: 100%;
 }
 
 .classic-board-wrapper {
-  width: 100%;
-  max-width: 860px;
+  /* Responsive viewport scaling: guarantees 100% of the entire board (all 4 sides) is completely visible without scrolling */
+  width: min(86vw, calc(100vh - 165px), 730px);
+  height: min(86vw, calc(100vh - 165px), 730px);
   aspect-ratio: 1 / 1;
   background: var(--board-felt);
   /* Wood frame bevel border */
-  border: 8px solid #23120b;
+  border: 7px solid #23120b;
   outline: 2px solid #573322;
   border-radius: 8px;
   box-shadow: 
-    0 35px 80px rgba(0, 0, 0, 0.85),
-    0 15px 30px rgba(0, 0, 0, 0.6);
+    0 28px 70px rgba(0, 0, 0, 0.85),
+    0 12px 24px rgba(0, 0, 0, 0.6);
   display: grid;
-  grid-template-columns: 1.5fr repeat(9, 1fr) 1.5fr;
-  grid-template-rows: 1.5fr repeat(9, 1fr) 1.5fr;
+  grid-template-columns: 1.45fr repeat(9, 1fr) 1.45fr;
+  grid-template-rows: 1.45fr repeat(9, 1fr) 1.45fr;
   position: relative;
   user-select: none;
   transform-style: preserve-3d;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: 50% 55%;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Individual Tiles */

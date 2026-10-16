@@ -50,8 +50,8 @@ export const App: React.FC = () => {
   const [isWalking, setIsWalking] = useState<boolean>(false);
   const [hoppingPlayerId, setHoppingPlayerId] = useState<string | null>(null);
 
-  // Default tilt is 18° for full, crisp visibility of the other side (Free Parking, Karnataka, Tamil Nadu, Go To Jail)
-  const [boardTilt, setBoardTilt] = useState<number>(18);
+  // Default tilt is 22°: carefully calibrated so 100% of the whole board (especially the far side: Free Parking, Karnataka, Tamil Nadu, Go To Jail) is completely visible in the viewport
+  const [boardTilt, setBoardTilt] = useState<number>(22);
   const [turnTimerSeconds, setTurnTimerSeconds] = useState<number>(75);
 
   const [tableTheme, setTableTheme] = useState<'wood' | 'emerald' | 'midnight'>(() => {
@@ -298,20 +298,46 @@ export const App: React.FC = () => {
       {/* TOP FLOATING HUD BAR (Matching User Video)                */}
       {/* ========================================================= */}
       <header className="top-hud-bar">
-        {/* Left: Turn Timer & Angle Switcher */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        {/* Left: Turn Timer & Camera Angle Controls */}
+        <div className="camera-controls-group">
           <div className="turn-timer-badge" title="Turn Countdown">
             <span>⏳</span>
             <span>{turnTimerSeconds}</span>
           </div>
 
-          <button
-            className="camera-tilt-toggle"
-            onClick={() => setBoardTilt((prev) => (prev > 0 ? 0 : 18))}
-            title="Toggle between 3D Tabletop and Top-Down view"
-          >
-            {boardTilt > 0 ? '📐 3D Tilt (18°)' : '📐 Flat View (0°)'}
-          </button>
+          <div className="camera-angle-capsule" title="Adjust Board Perspective Tilt">
+            <button
+              className="angle-step-btn"
+              onClick={() => setBoardTilt((prev) => Math.max(0, prev - 4))}
+              title="Tilt camera flatter / lower angle"
+            >
+              ▼
+            </button>
+            <span className="angle-display">
+              {boardTilt === 0 ? 'Flat (0°)' : `3D (${boardTilt}°)`}
+            </span>
+            <button
+              className="angle-step-btn"
+              onClick={() => setBoardTilt((prev) => Math.min(42, prev + 4))}
+              title="Tilt camera higher / steeper 3D"
+            >
+              ▲
+            </button>
+            <button
+              className={`angle-preset-btn ${boardTilt === 22 ? 'is-selected' : ''}`}
+              onClick={() => setBoardTilt(22)}
+              title="Calibrated Tabletop 3D (All sides 100% visible)"
+            >
+              Tabletop
+            </button>
+            <button
+              className={`angle-preset-btn ${boardTilt === 0 ? 'is-selected' : ''}`}
+              onClick={() => setBoardTilt(0)}
+              title="Top-down 2D flat view"
+            >
+              2D
+            </button>
+          </div>
         </div>
 
         {/* Center: Floating Player Capsules (Matching Video Header) */}
