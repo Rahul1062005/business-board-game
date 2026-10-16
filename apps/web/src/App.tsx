@@ -9,16 +9,15 @@ import {
   createInitialGameState,
   applyGameAction,
 } from '@business/game-engine';
-import { SPACES_BY_ID } from '@business/game-content';
+import { SPACES_BY_ID, BOARD_SPACES } from '@business/game-content';
 import { Board } from './components/Board.js';
-import { PlayerPanel } from './components/PlayerPanel.js';
-import { ActionLog } from './components/ActionLog.js';
 import { PropertyModal } from './components/PropertyModal.js';
 import { TradeModal } from './components/TradeModal.js';
 import { DebtModal } from './components/DebtModal.js';
 import { NewGameModal } from './components/NewGameModal.js';
 import { GameOverModal } from './components/GameOverModal.js';
 import { RulesModal } from './components/RulesModal.js';
+import { DeedsModal } from './components/DeedsModal.js';
 import { saveGameState, loadSavedGameState, clearSavedGameState } from './storage.js';
 
 export const App: React.FC = () => {
@@ -28,14 +27,12 @@ export const App: React.FC = () => {
     return createInitialGameState({
       mode: 'classic',
       players: [
-        { name: 'Rahul', token: 'auto-rickshaw', color: '#dc2626' }, // Classic Red
-        { name: 'Priya', token: 'chai-cup', color: '#2563eb' },      // Classic Blue
-        { name: 'Amit', token: 'peacock', color: '#16a34a' },       // Classic Green
+        { name: 'Bhoomsda', token: 'royal-elephant', color: '#2563eb' }, // Blue (From video)
+        { name: 'CandyBlossom5443', token: 'auto-rickshaw', color: '#db2777' }, // Pink (From video)
       ],
     });
   });
 
-  // Animated visual display positions for each player (for walking hops)
   const [displayPositions, setDisplayPositions] = useState<Record<string, number>>(() => {
     const initial: Record<string, number> = {};
     for (const p of gameState.players) {
@@ -45,12 +42,18 @@ export const App: React.FC = () => {
   });
 
   const [selectedSpace, setSelectedSpace] = useState<BoardSpace | null>(null);
-  const [tradingWithPlayerId, setTradingWithPlayerId] = useState<string | null>(null);
+  const [showTradeModal, setShowTradeModal] = useState<boolean>(false);
   const [showNewGameModal, setShowNewGameModal] = useState<boolean>(false);
   const [showRulesModal, setShowRulesModal] = useState<boolean>(false);
+  const [showDeedsAlbum, setShowDeedsAlbum] = useState<boolean>(false);
   const [isRolling, setIsRolling] = useState<boolean>(false);
   const [isWalking, setIsWalking] = useState<boolean>(false);
   const [hoppingPlayerId, setHoppingPlayerId] = useState<string | null>(null);
+
+  // Default tilt is 18° for full, crisp visibility of the other side (Free Parking, Karnataka, Tamil Nadu, Go To Jail)
+  const [boardTilt, setBoardTilt] = useState<number>(18);
+  const [turnTimerSeconds, setTurnTimerSeconds] = useState<number>(75);
+
   const [tableTheme, setTableTheme] = useState<'wood' | 'emerald' | 'midnight'>(() => {
     return (localStorage.getItem('business_table_theme') as any) || 'wood';
   });
@@ -59,6 +62,15 @@ export const App: React.FC = () => {
     document.body.className = `theme-${tableTheme}`;
     localStorage.setItem('business_table_theme', tableTheme);
   }, [tableTheme]);
+
+  // Turn timer countdown
+  useEffect(() => {
+    setTurnTimerSeconds(75);
+    const interval = setInterval(() => {
+      setTurnTimerSeconds((prev) => (prev > 1 ? prev - 1 : 75));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [gameState.activePlayerIndex]);
 
   // Synchronize displayPositions when gameState changes outside of walking
   useEffect(() => {
@@ -78,13 +90,12 @@ export const App: React.FC = () => {
     saveGameState(gameState);
   }, [gameState]);
 
-  // Roll dice with 3D throw animation followed by space-by-space avatar hopping!
+  // Roll dice with 3D throw animation followed by space-by-space avatar hopping
   const handleRollDice = () => {
     if (gameState.phase !== 'waiting_for_roll' || isRolling || isWalking) return;
 
     setIsRolling(true);
 
-    // Apply the ROLL_DICE action to get the authoritative result
     const result = applyGameAction(gameState, { type: 'ROLL_DICE' });
     if (!result.state || !result.state.lastDiceRoll) {
       setIsRolling(false);
@@ -96,22 +107,18 @@ export const App: React.FC = () => {
     const activePlayer = gameState.players[gameState.activePlayerIndex];
     const startPos = activePlayer.position;
 
-    // Phase 1: 3D Dice tumble and roll on the board (750ms)
     setTimeout(() => {
-      // Show final dice values
       setGameState((prev) => ({
         ...prev,
         lastDiceRoll: [d1, d2],
       }));
       setIsRolling(false);
 
-      // If active player was in detention and didn't roll doubles, no walking needed
       if (activePlayer.inDetention && d1 !== d2 && activePlayer.detentionTurns < 2) {
         setGameState(result.state);
         return;
       }
 
-      // Phase 2: Avatar hops step-by-step around the board tiles!
       setIsWalking(true);
       setHoppingPlayerId(activePlayer.id);
 
@@ -132,11 +139,10 @@ export const App: React.FC = () => {
           setTimeout(() => {
             setIsWalking(false);
             setHoppingPlayerId(null);
-            // Apply full authoritative resolved state
             setGameState(result.state);
           }, 200);
         }
-      }, 190); // 190ms per hop
+      }, 190);
     }, 750);
   };
 
@@ -271,55 +277,120 @@ export const App: React.FC = () => {
     setGameState(newState);
   };
 
+  const activePlayer = gameState.players[gameState.activePlayerIndex];
+
+  // Open property manager for first owned property or space
+  const handleOpenPropertyManager = () => {
+    const firstOwned = Object.values(gameState.properties).find(
+      (p) => p.ownerId === activePlayer.id
+    );
+    if (firstOwned) {
+      const space = SPACES_BY_ID.get(firstOwned.spaceId);
+      if (space) setSelectedSpace(space);
+    } else {
+      setShowDeedsAlbum(true);
+    }
+  };
+
   return (
-    <div className="app-container">
-      {/* Top Header */}
-      <header className="app-header">
-        <div className="header-brand">
-          <div className="header-logo">🎩</div>
-          <div>
-            <h1 className="header-title">BUSINESS</h1>
-            <div className="header-subtitle">
-              Classic Indian Property Trading Game • {gameState.mode === 'quick' ? '⚡ Quick Business' : '🏆 Classic'}
-            </div>
+    <div className="roblox-tabletop-container">
+      {/* ========================================================= */}
+      {/* TOP FLOATING HUD BAR (Matching User Video)                */}
+      {/* ========================================================= */}
+      <header className="top-hud-bar">
+        {/* Left: Turn Timer & Angle Switcher */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="turn-timer-badge" title="Turn Countdown">
+            <span>⏳</span>
+            <span>{turnTimerSeconds}</span>
           </div>
+
+          <button
+            className="camera-tilt-toggle"
+            onClick={() => setBoardTilt((prev) => (prev > 0 ? 0 : 18))}
+            title="Toggle between 3D Tabletop and Top-Down view"
+          >
+            {boardTilt > 0 ? '📐 3D Tilt (18°)' : '📐 Flat View (0°)'}
+          </button>
         </div>
 
-        <div className="header-stats">
+        {/* Center: Floating Player Capsules (Matching Video Header) */}
+        <div className="top-players-row">
+          {gameState.players.map((player, idx) => {
+            const isActive = player.id === activePlayer.id;
+            return (
+              <div
+                key={player.id}
+                className={`player-hud-capsule ${isActive ? 'is-active' : ''}`}
+                style={{
+                  borderLeftColor: player.color,
+                  borderLeftWidth: '5px',
+                }}
+              >
+                <div
+                  className="player-hud-avatar"
+                  style={{ backgroundColor: player.color }}
+                >
+                  {player.token === 'auto-rickshaw' && '🛺'}
+                  {player.token === 'chai-cup' && '☕'}
+                  {player.token === 'peacock' && '🦚'}
+                  {player.token === 'cricket-bat' && '🏏'}
+                  {player.token === 'royal-elephant' && '🐘'}
+                  {player.token === 'tiger' && '🐅'}
+                </div>
+
+                <div className="player-hud-info">
+                  <div className="player-hud-name-row">
+                    <span>{player.name}</span>
+                    <span className="player-hud-flame">🔥 {idx + 1}</span>
+                  </div>
+                  <div className="player-hud-cash">₹{player.cash}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Right: Theme & Settings */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <select
             className="theme-selector-dropdown"
             value={tableTheme}
             onChange={(e) => setTableTheme(e.target.value as any)}
-            title="Change Tabletop Background"
+            title="Tabletop Background Theme"
           >
-            <option value="wood">🪵 Luxury Walnut Table</option>
-            <option value="emerald">♠️ Casino Emerald Felt</option>
-            <option value="midnight">🌌 Midnight High-Roller</option>
+            <option value="wood">🪵 Living Room Table</option>
+            <option value="emerald">♠️ Casino Emerald</option>
+            <option value="midnight">🌌 Midnight Lounge</option>
           </select>
+
           <button
             className="btn-secondary"
             onClick={() => setShowRulesModal(true)}
-            style={{ fontSize: '0.85rem' }}
+            style={{ fontSize: '0.8rem', padding: '6px 12px' }}
           >
             📖 Rules
           </button>
+
           <button
             className="btn-primary"
             onClick={() => setShowNewGameModal(true)}
-            style={{ fontSize: '0.85rem' }}
+            style={{ fontSize: '0.8rem', padding: '6px 12px' }}
           >
-            + New Game
+            + New
           </button>
         </div>
       </header>
 
-      {/* Main Board & Players Layout */}
-      <div className="game-layout">
-        {/* Left Arena: 40-space classic Monopoly board with 3D dice */}
+      {/* ========================================================= */}
+      {/* 3D TABLETOP ARENA                                         */}
+      {/* ========================================================= */}
+      <main className="tabletop-center-arena">
         <Board
           state={gameState}
           displayPositions={displayPositions}
           hoppingPlayerId={hoppingPlayerId}
+          boardTilt={boardTilt}
           onSelectSpace={(space) => setSelectedSpace(space)}
           onRollDice={handleRollDice}
           onEndTurn={handleEndTurn}
@@ -328,27 +399,112 @@ export const App: React.FC = () => {
           isRolling={isRolling}
           isWalking={isWalking}
         />
+      </main>
 
-        {/* Right Sidebar: Players, Assets, & Transaction Feed */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <div className="glass-panel" style={{ padding: '16px' }}>
-            <PlayerPanel
-              state={gameState}
-              onOpenTrade={(targetId) => setTradingWithPlayerId(targetId)}
-              onSelectProperty={(spaceId) => {
-                const space = SPACES_BY_ID.get(spaceId);
-                if (space) setSelectedSpace(space);
-              }}
-            />
+      {/* ========================================================= */}
+      {/* BOTTOM ACTION DOCK (Matching Video 00:05 - 00:41)         */}
+      {/* ========================================================= */}
+      <footer className="roblox-bottom-bar">
+        {/* Left: Round Pill */}
+        <div className="bottom-left-space">
+          <span className="round-pill">
+            Round {gameState.round}
+          </span>
+        </div>
+
+        {/* Center Dock of Action Cards (Manage, View Deeds, Trading, Roll/End Turn) */}
+        <div className="roblox-action-dock">
+          {/* Card 1: Manage Properties */}
+          <button
+            className="dock-card-btn"
+            onClick={handleOpenPropertyManager}
+            title="Manage Houses & Mortgages on Your Properties"
+          >
+            <span className="dock-card-icon">🏠</span>
+            <span className="dock-card-title">MANAGE</span>
+            <span className="dock-card-sub">PROPERTIES</span>
+          </button>
+
+          {/* Card 2: View Deeds (Illustrated Album Button from Video) */}
+          <button
+            className="dock-card-btn dock-card-deeds"
+            onClick={() => setShowDeedsAlbum(true)}
+            title="View Title Deeds Album"
+          >
+            <span className="dock-card-icon">📖🔍</span>
+            <span className="dock-card-title">VIEW DEEDS</span>
+            <span className="dock-card-sub">ALBUM</span>
+          </button>
+
+          {/* Card 3: Trading */}
+          <button
+            className="dock-card-btn"
+            onClick={() => setShowTradeModal(true)}
+            disabled={gameState.players.filter((p) => !p.isBankrupt).length <= 1}
+            title="Propose Trade Deal"
+          >
+            <span className="dock-card-icon">🤝</span>
+            <span className="dock-card-title">TRADING</span>
+            <span className="dock-card-sub">PROPOSAL</span>
+          </button>
+
+          {/* Card 4: Roll Dice / End Turn */}
+          {gameState.phase === 'waiting_for_roll' && (
+            <button
+              className="dock-card-btn dock-card-roll"
+              onClick={handleRollDice}
+              disabled={isRolling || isWalking}
+            >
+              <span className="dock-card-icon">🎲</span>
+              <span className="dock-card-title">ROLL</span>
+              <span className="dock-card-sub">DICE</span>
+            </button>
+          )}
+
+          {gameState.phase === 'action_phase' && !isWalking && (
+            <button
+              className="dock-card-btn dock-card-endturn"
+              onClick={handleEndTurn}
+            >
+              <span className="dock-card-icon">✓</span>
+              <span className="dock-card-title">END TURN</span>
+              <span className="dock-card-sub">NEXT</span>
+            </button>
+          )}
+        </div>
+
+        {/* Right: Turn Status Text from Video */}
+        <div className="bottom-right-status">
+          <div className="turn-status-text">
+            Turn {gameState.round}
           </div>
-
-          <div className="glass-panel" style={{ padding: '16px' }}>
-            <ActionLog logs={gameState.actionLog} />
+          <div className="turn-player-text">
+            {activePlayer.name}'s turn
           </div>
         </div>
-      </div>
+      </footer>
 
-      {/* Property Details Modal */}
+      {/* ========================================================= */}
+      {/* MODALS                                                    */}
+      {/* ========================================================= */}
+      {showDeedsAlbum && (
+        <DeedsModal
+          state={gameState}
+          onClose={() => setShowDeedsAlbum(false)}
+          onSelectProperty={(space) => setSelectedSpace(space)}
+        />
+      )}
+
+      {showTradeModal && (
+        <TradeModal
+          state={gameState}
+          onClose={() => setShowTradeModal(false)}
+          onProposeTrade={handleProposeTrade}
+          onAcceptTrade={handleAcceptTrade}
+          onRejectTrade={handleRejectTrade}
+        />
+      )}
+
       {selectedSpace && (
         <PropertyModal
           space={selectedSpace}
@@ -361,19 +517,6 @@ export const App: React.FC = () => {
         />
       )}
 
-      {/* Trade Modal */}
-      {tradingWithPlayerId && (
-        <TradeModal
-          state={gameState}
-          targetPlayerId={tradingWithPlayerId}
-          onClose={() => setTradingWithPlayerId(null)}
-          onProposeTrade={handleProposeTrade}
-          onAcceptTrade={handleAcceptTrade}
-          onRejectTrade={handleRejectTrade}
-        />
-      )}
-
-      {/* Debt Resolution Modal */}
       {gameState.phase === 'debt_resolution' && (
         <DebtModal
           state={gameState}
@@ -384,7 +527,6 @@ export const App: React.FC = () => {
         />
       )}
 
-      {/* New Game Setup Modal */}
       {showNewGameModal && (
         <NewGameModal
           onStart={handleStartNewGame}
@@ -393,7 +535,6 @@ export const App: React.FC = () => {
         />
       )}
 
-      {/* Game Over Summary Modal */}
       {gameState.phase === 'game_over' && (
         <GameOverModal
           state={gameState}
@@ -402,7 +543,6 @@ export const App: React.FC = () => {
         />
       )}
 
-      {/* How to Play Rules Modal */}
       {showRulesModal && (
         <RulesModal onClose={() => setShowRulesModal(false)} />
       )}

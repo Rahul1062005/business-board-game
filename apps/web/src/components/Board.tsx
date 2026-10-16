@@ -5,8 +5,9 @@ import { Dice3D } from './Dice3D.js';
 
 interface BoardProps {
   state: GameState;
-  displayPositions: Record<string, number>; // Animated display position of each player
+  displayPositions: Record<string, number>;
   hoppingPlayerId: string | null;
+  boardTilt: number; // In degrees, e.g. 18deg
   onSelectSpace: (space: BoardSpace) => void;
   onRollDice: () => void;
   onEndTurn: () => void;
@@ -22,34 +23,26 @@ export function getTileGridPosition40(index: number): {
   orientation: 'bottom' | 'left' | 'top' | 'right' | 'corner';
 } {
   // 40 spaces in an 11x11 grid:
-  // 0: Bottom-Right Corner (GO)
   if (index === 0) return { gridColumn: 11, gridRow: 11, orientation: 'corner' };
 
-  // 1 to 9: Bottom Row (Right to Left)
   if (index >= 1 && index <= 9) {
     return { gridColumn: 11 - index, gridRow: 11, orientation: 'bottom' };
   }
 
-  // 10: Bottom-Left Corner (JAIL)
   if (index === 10) return { gridColumn: 1, gridRow: 11, orientation: 'corner' };
 
-  // 11 to 19: Left Column (Bottom to Top)
   if (index >= 11 && index <= 19) {
     return { gridColumn: 1, gridRow: 11 - (index - 10), orientation: 'left' };
   }
 
-  // 20: Top-Left Corner (FREE PARKING)
   if (index === 20) return { gridColumn: 1, gridRow: 1, orientation: 'corner' };
 
-  // 21 to 29: Top Row (Left to Right)
   if (index >= 21 && index <= 29) {
     return { gridColumn: 1 + (index - 20), gridRow: 1, orientation: 'top' };
   }
 
-  // 30: Top-Right Corner (GO TO JAIL)
   if (index === 30) return { gridColumn: 11, gridRow: 1, orientation: 'corner' };
 
-  // 31 to 39: Right Column (Top to Bottom)
   if (index >= 31 && index <= 39) {
     return { gridColumn: 11, gridRow: 1 + (index - 30), orientation: 'right' };
   }
@@ -61,6 +54,7 @@ export const Board: React.FC<BoardProps> = ({
   state,
   displayPositions,
   hoppingPlayerId,
+  boardTilt,
   onSelectSpace,
   onRollDice,
   onEndTurn,
@@ -73,8 +67,13 @@ export const Board: React.FC<BoardProps> = ({
   const activeSpace = BOARD_SPACES[activePlayer.position];
 
   return (
-    <div className="classic-board-container">
-      <div className="classic-board-wrapper">
+    <div className="tabletop-perspective-stage">
+      <div
+        className="classic-board-wrapper"
+        style={{
+          transform: `rotateX(${boardTilt}deg) rotateZ(0deg)`,
+        }}
+      >
         {/* Render all 40 tiles */}
         {BOARD_SPACES.map((space) => {
           const { gridColumn, gridRow, orientation } = getTileGridPosition40(space.index);
@@ -84,7 +83,6 @@ export const Board: React.FC<BoardProps> = ({
             ? state.players.find((p) => p.id === propState.ownerId)
             : null;
 
-          // Find players currently on this space (using animated displayPositions)
           const playersHere = state.players.filter(
             (p) => !p.isBankrupt && (displayPositions[p.id] ?? p.position) === space.index
           );
@@ -103,7 +101,7 @@ export const Board: React.FC<BoardProps> = ({
               {/* Corner Custom Graphics */}
               {space.index === 0 && (
                 <div className="corner-content corner-go">
-                  <div className="go-salary">COLLECT ₹200 SALARY AS YOU PASS</div>
+                  <div className="go-salary">COLLECT ₹200 AS YOU PASS</div>
                   <div className="go-title">GO</div>
                   <div className="go-arrow">⮜</div>
                 </div>
@@ -139,7 +137,6 @@ export const Board: React.FC<BoardProps> = ({
               {/* Regular Edge Spaces */}
               {!isCorner && (
                 <>
-                  {/* Colored Property Bar (Matches standard placement based on orientation) */}
                   {space.categoryColor && (
                     <div
                       className={`tile-color-bar bar-${orientation}`}
@@ -148,7 +145,6 @@ export const Board: React.FC<BoardProps> = ({
                   )}
 
                   <div className="tile-content">
-                    {/* Icon for non-property spaces (Railroads, Utilities, Cards, Taxes) */}
                     {space.icon && !space.categoryColor && (
                       <div className="tile-icon">{space.icon}</div>
                     )}
@@ -169,7 +165,7 @@ export const Board: React.FC<BoardProps> = ({
                       <div className="tile-price">PAY ₹{space.taxAmount}</div>
                     )}
 
-                    {/* Ownership Flag */}
+                    {/* Owner Tag */}
                     {owner && (
                       <div
                         className="tile-owner-indicator"
@@ -178,7 +174,7 @@ export const Board: React.FC<BoardProps> = ({
                       />
                     )}
 
-                    {/* Upgrades Stars or Flagship Crown */}
+                    {/* Upgrades */}
                     {propState && propState.upgradeLevel > 0 && (
                       <div className="tile-upgrade-icons">
                         {propState.upgradeLevel === 5 ? (
@@ -191,7 +187,6 @@ export const Board: React.FC<BoardProps> = ({
                       </div>
                     )}
 
-                    {/* Mortgaged Overlay */}
                     {propState?.isMortgaged && (
                       <div className="mortgaged-banner">MORTGAGED</div>
                     )}
@@ -199,7 +194,7 @@ export const Board: React.FC<BoardProps> = ({
                 </>
               )}
 
-              {/* Player Pawns / Avatars on this tile */}
+              {/* Player Pawns */}
               {playersHere.length > 0 && (
                 <div className="tile-pawns-container">
                   {playersHere.map((p) => {
@@ -228,9 +223,9 @@ export const Board: React.FC<BoardProps> = ({
           );
         })}
 
-        {/* Center Board Area: Classic Red Angled Banner & 3D Dice Tray */}
+        {/* Center Board: Physical 3D Card Decks & 3D Dice */}
         <div className="classic-center-board">
-          {/* Classic Angled Red Logo Box (Like the MONOPOLY box in reference image) */}
+          {/* Angled Red MONOPOLY Box Banner */}
           <div className="classic-red-banner">
             <div className="banner-inner">
               <span className="banner-title">BUSINESS</span>
@@ -238,97 +233,57 @@ export const Board: React.FC<BoardProps> = ({
             </div>
           </div>
 
-          {/* Diagonal Card Slots */}
-          <div className="card-slot community-chest-slot">
-            <div className="slot-title">COMMUNITY CHEST</div>
-            <div className="slot-subtitle">FOLLOW INSTRUCTIONS ON TOP CARD</div>
-            <div className="slot-icon">📦</div>
+          {/* Physical 3D Raised Blue Community Chest Card Deck (Matches Image 3) */}
+          <div className="physical-deck-3d deck-community-chest" title="Community Chest Deck">
+            <div className="deck-card-top">
+              <div className="deck-card-border">
+                <span className="deck-card-icon">📦</span>
+                <span className="deck-card-title">COMMUNITY CHEST</span>
+              </div>
+            </div>
+            <div className="deck-side-stack"></div>
           </div>
 
-          <div className="card-slot chance-slot">
-            <div className="slot-title">CHANCE</div>
-            <div className="slot-subtitle">FOLLOW INSTRUCTIONS ON TOP CARD</div>
-            <div className="slot-icon">❓</div>
+          {/* Physical 3D Raised Gold Chance Card Deck (Matches Image 3) */}
+          <div className="physical-deck-3d deck-chance" title="Chance Deck">
+            <div className="deck-card-top">
+              <div className="deck-card-border">
+                <span className="deck-card-icon">❓</span>
+                <span className="deck-card-title">CHANCE</span>
+              </div>
+            </div>
+            <div className="deck-side-stack"></div>
           </div>
 
-          {/* 3D Dice Area in Center */}
+          {/* 3D Dice in Center Stage */}
           <div className="center-dice-stage">
             <Dice3D
               dice={state.lastDiceRoll}
               isRolling={isRolling}
             />
 
-            {/* Turn Status & Controls */}
-            <div className="turn-action-bar">
-              <div
-                className="active-player-pill"
-                style={{ borderColor: activePlayer.color }}
-              >
-                <div
-                  className="player-avatar-circle"
-                  style={{ backgroundColor: activePlayer.color }}
-                >
-                  {activePlayer.token === 'auto-rickshaw' && '🛺'}
-                  {activePlayer.token === 'chai-cup' && '☕'}
-                  {activePlayer.token === 'peacock' && '🦚'}
-                  {activePlayer.token === 'cricket-bat' && '🏏'}
-                  {activePlayer.token === 'royal-elephant' && '🐘'}
-                  {activePlayer.token === 'tiger' && '🐅'}
+            {/* In-Game Action Bar if decision pending */}
+            {state.phase === 'buying_decision' && !isWalking && (
+              <div className="center-action-prompt">
+                <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#0f172a', marginBottom: '6px' }}>
+                  Landed on {activeSpace.name} (₹{activeSpace.price})
                 </div>
-                <div style={{ textAlign: 'left' }}>
-                  <div style={{ fontWeight: 800, fontSize: '0.95rem', color: '#1e293b' }}>
-                    {activePlayer.name}'s Turn
-                  </div>
-                  <div style={{ fontSize: '0.8rem', color: '#047857', fontWeight: 800 }}>
-                    ₹{activePlayer.cash}
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              {state.phase === 'waiting_for_roll' && (
-                <button
-                  className="btn-classic-primary"
-                  onClick={onRollDice}
-                  disabled={isRolling || isWalking}
-                >
-                  🎲 Roll Dice
-                </button>
-              )}
-
-              {isWalking && (
-                <div className="walking-indicator">
-                  🚶 Moving {activePlayer.name}...
-                </div>
-              )}
-
-              {state.phase === 'buying_decision' && !isWalking && (
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
                   <button
                     className="btn-classic-primary"
                     onClick={onBuyProperty}
                     disabled={activePlayer.cash < (activeSpace.price || 0)}
                   >
-                    Buy {activeSpace.name} (₹{activeSpace.price})
+                    Buy Property
                   </button>
                   <button className="btn-classic-secondary" onClick={onDeclineProperty}>
                     Pass
                   </button>
                 </div>
-              )}
+              </div>
+            )}
 
-              {state.phase === 'action_phase' && !isWalking && (
-                <button
-                  className="btn-classic-primary"
-                  onClick={onEndTurn}
-                  style={{ background: '#059669', borderColor: '#047857' }}
-                >
-                  ✓ End Turn
-                </button>
-              )}
-            </div>
-
-            {/* Event Card Banner if drawn */}
+            {/* Event Card Drawn Notification */}
             {state.currentEventCard && !isWalking && (
               <div className="center-event-card-alert">
                 <div className="card-alert-header">

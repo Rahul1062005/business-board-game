@@ -15,9 +15,6 @@
   --color-green: #43A047;
   --color-darkblue: #0D47A1;
 
-  --accent-gold: #f59e0b;
-  --accent-red: #dc2626;
-
   --font-board: 'Outfit', 'Arial Black', sans-serif;
   --font-ui: 'Plus Jakarta Sans', sans-serif;
 }
@@ -29,168 +26,177 @@
 }
 
 /* ========================================================= */
-/* THEMES & BACKGROUNDS (Luxury Tabletop Parlors)            */
+/* LIVING ROOM TABLETOP ENVIRONMENT (Matching User Screenshots)*/
 /* ========================================================= */
-
-/* Theme 1 (Default): Luxury Mahogany & Walnut Gaming Table */
-body.theme-wood {
-  background-color: #1a0f0a;
-  background-image: 
-    radial-gradient(circle at 50% 45%, rgba(251, 191, 36, 0.16) 0%, rgba(26, 15, 10, 0.82) 65%, #0d0603 100%),
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.015) 0px, rgba(0, 0, 0, 0.03) 2px, transparent 4px, transparent 36px),
-    repeating-linear-gradient(0deg, rgba(80, 42, 22, 0.45) 0px, rgba(46, 23, 11, 0.45) 50px, rgba(26, 13, 6, 0.7) 110px);
-  color: #f8fafc;
-  box-shadow: inset 0 0 180px rgba(0, 0, 0, 0.9);
-}
-
-/* Theme 2: Casino Emerald Velvet Gaming Felt */
-body.theme-emerald {
-  background-color: #062b1b;
-  background-image:
-    radial-gradient(circle at 50% 45%, rgba(52, 211, 153, 0.18) 0%, rgba(6, 43, 27, 0.88) 65%, #02140b 100%),
-    radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.04) 0%, transparent 40%),
-    radial-gradient(circle at 85% 80%, rgba(0, 0, 0, 0.5) 0%, transparent 50%),
-    repeating-radial-gradient(circle at 50% 50%, transparent 0, transparent 4px, rgba(0, 0, 0, 0.02) 5px);
-  color: #f8fafc;
-  box-shadow: inset 0 0 160px rgba(0, 0, 0, 0.85);
-}
-
-/* Theme 3: Midnight High-Roller Obsidian Lounge */
-body.theme-midnight {
-  background-color: #070c18;
-  background-image:
-    radial-gradient(circle at 50% 45%, rgba(59, 130, 246, 0.16) 0%, rgba(7, 12, 24, 0.9) 68%, #020408 100%),
-    radial-gradient(circle at 15% 20%, rgba(168, 85, 247, 0.08) 0%, transparent 45%),
-    radial-gradient(circle at 85% 75%, rgba(56, 189, 248, 0.07) 0%, transparent 45%);
-  color: #f8fafc;
-  box-shadow: inset 0 0 160px rgba(0, 0, 0, 0.85);
-}
-
 body {
   font-family: var(--font-ui);
   min-height: 100vh;
   overflow-x: hidden;
-  line-height: 1.4;
+  color: #f8fafc;
+  /* Cozy sunlit living room with natural soft shadows & wooden coffee table */
+  background-color: #1e130c;
+  background-image:
+    radial-gradient(ellipse at 50% 30%, rgba(254, 243, 199, 0.18) 0%, rgba(30, 19, 12, 0.8) 65%, #0e0704 100%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.015) 0px, rgba(0, 0, 0, 0.04) 2px, transparent 4px, transparent 38px),
+    repeating-linear-gradient(0deg, rgba(90, 48, 24, 0.5) 0px, rgba(50, 25, 12, 0.5) 45px, rgba(30, 15, 7, 0.75) 100px);
   -webkit-font-smoothing: antialiased;
-  transition: background-color 0.4s ease;
 }
 
-button {
-  font-family: inherit;
-  cursor: pointer;
-  border: none;
-  outline: none;
-  transition: all 0.2s ease;
+body.theme-emerald {
+  background-color: #062b1b;
+  background-image:
+    radial-gradient(circle at 50% 40%, rgba(52, 211, 153, 0.18) 0%, rgba(6, 43, 27, 0.88) 65%, #02140b 100%),
+    radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.04) 0%, transparent 40%),
+    radial-gradient(circle at 85% 80%, rgba(0, 0, 0, 0.5) 0%, transparent 50%);
 }
 
-input, select {
-  font-family: inherit;
-  outline: none;
+body.theme-midnight {
+  background-color: #070c18;
+  background-image:
+    radial-gradient(circle at 50% 40%, rgba(59, 130, 246, 0.18) 0%, rgba(7, 12, 24, 0.9) 68%, #020408 100%),
+    radial-gradient(circle at 15% 20%, rgba(168, 85, 247, 0.08) 0%, transparent 45%);
 }
 
-/* App Container */
-.app-container {
-  max-width: 1720px;
-  margin: 0 auto;
-  padding: 14px 20px;
+/* Master Living Room Viewport */
+.roblox-tabletop-container {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  gap: 14px;
+  position: relative;
+  overflow: hidden;
+  justify-content: space-between;
+  padding: 12px 18px;
 }
 
-/* App Header */
-.app-header {
+/* Top Floating HUD Bar (Hourglass timer, Player capsules, sound) */
+.top-hud-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 22px;
-  background: rgba(22, 14, 10, 0.75);
-  border: 1px solid rgba(251, 191, 36, 0.25);
-  border-radius: 14px;
-  backdrop-filter: blur(14px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  z-index: 50;
+  width: 100%;
+  max-width: 1560px;
+  margin: 0 auto;
 }
 
-body.theme-emerald .app-header {
-  background: rgba(6, 35, 22, 0.75);
-  border-color: rgba(52, 211, 153, 0.25);
-}
-
-body.theme-midnight .app-header {
-  background: rgba(12, 18, 34, 0.75);
-  border-color: rgba(59, 130, 246, 0.25);
-}
-
-.header-brand {
+/* ⏳ Timer Badge on Top Left */
+.turn-timer-badge {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #0f172a;
+  border: 2px solid #0f172a;
+  border-radius: 12px;
+  padding: 6px 14px;
+  font-size: 1.15rem;
+  font-weight: 900;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
 }
 
-.header-logo {
-  width: 42px;
-  height: 42px;
-  background: linear-gradient(135deg, #dc2626, #991b1b);
+.camera-tilt-toggle {
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: white;
+  padding: 6px 12px;
   border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  backdrop-filter: blur(8px);
+}
+.camera-tilt-toggle:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Floating Player Capsules in Top Center */
+.top-players-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.player-hud-capsule {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 14px 4px 6px;
+  border-radius: 30px;
+  background: rgba(18, 24, 38, 0.85);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.player-hud-capsule.is-active {
+  transform: scale(1.06);
+  border-color: #fbbf24;
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.5), 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.player-hud-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
-  border: 1.5px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.5);
+  font-size: 16px;
+  border: 1.5px solid white;
 }
 
-.header-title {
-  font-family: var(--font-board);
-  font-size: 1.45rem;
-  font-weight: 900;
-  letter-spacing: 0.5px;
+.player-hud-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.player-hud-name-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.82rem;
+  font-weight: 800;
   color: #ffffff;
 }
 
-.header-subtitle {
-  font-size: 0.75rem;
-  color: #fbbf24;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.header-stats {
-  display: flex;
+.player-hud-flame {
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
-}
-
-.theme-selector-dropdown {
-  background: rgba(0, 0, 0, 0.4);
-  color: #f8fafc;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #ea580c;
+  color: white;
   border-radius: 8px;
-  padding: 6px 10px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  padding: 0 4px;
+  font-size: 0.65rem;
+  font-weight: 800;
 }
 
-/* Layout Grid */
-.game-layout {
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 18px;
+.player-hud-cash {
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: #34d399; /* Neon money green from user screenshot */
+  letter-spacing: 0.2px;
+}
+
+/* ========================================================= */
+/* 3D TABLETOP PERSPECTIVE ARENA                             */
+/* ========================================================= */
+.tabletop-center-arena {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
   flex: 1;
-  align-items: start;
+  padding: 10px 0;
 }
 
-@media (max-width: 1240px) {
-  .game-layout {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* ========================================================= */
-/* CLASSIC MONOPOLY BOARD (11x11 Grid, 40 spaces)            */
-/* ========================================================= */
-.classic-board-container {
+.tabletop-perspective-stage {
+  perspective: 1600px;
+  perspective-origin: 50% 45%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -202,19 +208,20 @@ body.theme-midnight .app-header {
   max-width: 860px;
   aspect-ratio: 1 / 1;
   background: var(--board-felt);
-  /* Wood Frame Bevel border making it look like a physical luxury board */
-  border: 10px solid #23120b;
+  /* Wood frame bevel border */
+  border: 8px solid #23120b;
   outline: 2px solid #573322;
   border-radius: 8px;
   box-shadow: 
-    0 30px 80px rgba(0, 0, 0, 0.85),
-    0 12px 30px rgba(0, 0, 0, 0.6),
-    0 0 100px rgba(251, 191, 36, 0.08);
+    0 35px 80px rgba(0, 0, 0, 0.85),
+    0 15px 30px rgba(0, 0, 0, 0.6);
   display: grid;
   grid-template-columns: 1.5fr repeat(9, 1fr) 1.5fr;
   grid-template-rows: 1.5fr repeat(9, 1fr) 1.5fr;
   position: relative;
   user-select: none;
+  transform-style: preserve-3d;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Individual Tiles */
@@ -225,16 +232,16 @@ body.theme-midnight .app-header {
   display: flex;
   cursor: pointer;
   overflow: hidden;
-  transition: filter 0.15s ease, transform 0.15s ease;
+  transition: filter 0.15s ease;
   font-family: var(--font-board);
 }
 
 .classic-tile:hover {
-  filter: brightness(0.95);
+  filter: brightness(0.93);
   z-index: 10;
 }
 
-/* Orientation Specific Layouts */
+/* Orientation Tile Layouts */
 .tile-bottom {
   flex-direction: column;
   justify-content: flex-start;
@@ -263,48 +270,28 @@ body.theme-midnight .app-header {
   padding-right: 3px;
 }
 
-/* Color Bands */
-.tile-color-bar {
-  border: 1px solid var(--tile-border);
-}
-
+/* Color Bars */
 .tile-bottom .tile-color-bar {
   width: 100%;
   height: 18px;
   border-bottom: 2px solid var(--tile-border);
-  border-top: none;
-  border-left: none;
-  border-right: none;
 }
-
 .tile-top .tile-color-bar {
   width: 100%;
   height: 18px;
   border-top: 2px solid var(--tile-border);
-  border-bottom: none;
-  border-left: none;
-  border-right: none;
 }
-
 .tile-left .tile-color-bar {
   width: 18px;
   height: 100%;
   border-left: 2px solid var(--tile-border);
-  border-top: none;
-  border-bottom: none;
-  border-right: none;
 }
-
 .tile-right .tile-color-bar {
   width: 18px;
   height: 100%;
   border-right: 2px solid var(--tile-border);
-  border-top: none;
-  border-bottom: none;
-  border-left: none;
 }
 
-/* Tile Internal Typography */
 .tile-content {
   flex: 1;
   display: flex;
@@ -329,7 +316,6 @@ body.theme-midnight .app-header {
   font-size: 0.52rem;
   font-weight: 700;
   color: #64748b;
-  letter-spacing: 0.2px;
 }
 
 .tile-price {
@@ -360,13 +346,8 @@ body.theme-midnight .app-header {
   justify-content: center;
 }
 
-.upgrade-house {
-  font-size: 8px;
-}
-
-.flagship-crown {
-  font-size: 10px;
-}
+.upgrade-house { font-size: 8px; }
+.flagship-crown { font-size: 10px; }
 
 .mortgaged-banner {
   position: absolute;
@@ -378,12 +359,9 @@ body.theme-midnight .app-header {
   display: flex;
   align-items: center;
   justify-content: center;
-  text-transform: uppercase;
 }
 
-/* ========================================================= */
-/* CORNER SPACES                                             */
-/* ========================================================= */
+/* Corners */
 .tile-corner {
   background: #fdfdfc;
   display: flex;
@@ -391,7 +369,6 @@ body.theme-midnight .app-header {
   justify-content: center;
   text-align: center;
 }
-
 .corner-content {
   width: 100%;
   height: 100%;
@@ -403,32 +380,11 @@ body.theme-midnight .app-header {
   padding: 4px;
 }
 
-/* GO Corner */
-.corner-go {
-  background: #eef7ee;
-}
-.go-salary {
-  font-size: 0.52rem;
-  font-weight: 800;
-  color: #1e293b;
-  line-height: 1.1;
-  text-transform: uppercase;
-}
-.go-title {
-  font-size: 2.2rem;
-  font-weight: 900;
-  color: #dc2626;
-  letter-spacing: -1px;
-  margin: -2px 0;
-}
-.go-arrow {
-  font-size: 1.4rem;
-  color: #dc2626;
-  font-weight: 900;
-  line-height: 0.8;
-}
+.corner-go { background: #eef7ee; }
+.go-salary { font-size: 0.52rem; font-weight: 800; color: #1e293b; text-transform: uppercase; }
+.go-title { font-size: 2.2rem; font-weight: 900; color: #dc2626; margin: -2px 0; }
+.go-arrow { font-size: 1.4rem; color: #dc2626; font-weight: 900; line-height: 0.8; }
 
-/* JAIL Corner */
 .corner-jail {
   background: #fff;
   display: grid;
@@ -442,7 +398,6 @@ body.theme-midnight .app-header {
   font-size: 0.55rem;
   font-weight: 900;
   color: #000;
-  text-align: center;
   align-self: center;
 }
 .jail-cell {
@@ -456,59 +411,28 @@ body.theme-midnight .app-header {
   justify-content: center;
   padding: 2px;
 }
-.jail-bars {
-  font-size: 16px;
-}
-.jail-text {
-  font-size: 0.55rem;
-  font-weight: 900;
-  color: #000;
-}
+.jail-bars { font-size: 16px; }
+.jail-text { font-size: 0.55rem; font-weight: 900; color: #000; }
 .jail-strip-right {
   grid-column: 2 / 3;
   grid-row: 2 / 3;
   font-size: 0.55rem;
   font-weight: 900;
   color: #000;
-  text-align: center;
   align-self: center;
 }
 
-/* FREE PARKING Corner */
-.corner-parking {
-  background: #fdfdfc;
-  transform: rotate(45deg);
-}
-.parking-top {
-  font-size: 0.7rem;
-  font-weight: 900;
-  color: #dc2626;
-}
-.parking-car {
-  font-size: 24px;
-}
-.parking-bottom {
-  font-size: 0.65rem;
-  font-weight: 900;
-  color: #dc2626;
-}
+.corner-parking { background: #fdfdfc; transform: rotate(45deg); }
+.parking-top { font-size: 0.7rem; font-weight: 900; color: #dc2626; }
+.parking-car { font-size: 24px; }
+.parking-bottom { font-size: 0.65rem; font-weight: 900; color: #dc2626; }
 
-/* GO TO JAIL Corner */
-.corner-gotojail {
-  background: #fdfdfc;
-  transform: rotate(-45deg);
-}
-.gotojail-title {
-  font-size: 0.7rem;
-  font-weight: 900;
-  color: #1e3a8a;
-}
-.gotojail-cop {
-  font-size: 24px;
-}
+.corner-gotojail { background: #fdfdfc; transform: rotate(-45deg); }
+.gotojail-title { font-size: 0.7rem; font-weight: 900; color: #1e3a8a; }
+.gotojail-cop { font-size: 24px; }
 
 /* ========================================================= */
-/* CENTER OF THE BOARD (Classic red banner & cards)          */
+/* CENTER OF THE BOARD & PHYSICAL 3D CARD DECKS (Image 3)    */
 /* ========================================================= */
 .classic-center-board {
   grid-column: 2 / 11;
@@ -523,7 +447,7 @@ body.theme-midnight .app-header {
   overflow: hidden;
 }
 
-/* Classic Angled Red MONOPOLY-style Banner */
+/* Classic Red Angled Banner */
 .classic-red-banner {
   position: absolute;
   top: 48%;
@@ -536,14 +460,7 @@ body.theme-midnight .app-header {
   z-index: 2;
   pointer-events: none;
 }
-
-.banner-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
+.banner-inner { display: flex; flex-direction: column; align-items: center; text-align: center; }
 .banner-title {
   font-family: var(--font-board);
   font-size: 3.2rem;
@@ -553,7 +470,6 @@ body.theme-midnight .app-header {
   text-shadow: 2px 2px 0px #000000;
   line-height: 1;
 }
-
 .banner-subtitle {
   font-family: var(--font-ui);
   font-size: 0.65rem;
@@ -563,160 +479,215 @@ body.theme-midnight .app-header {
   margin-top: 2px;
 }
 
-/* Diagonal Card Outline Slots */
-.card-slot {
+/* PHYSICAL 3D RAISED CARD DECKS (Matches Image 3) */
+.physical-deck-3d {
   position: absolute;
-  width: 140px;
-  height: 90px;
-  border: 2px dashed rgba(17, 24, 39, 0.35);
-  border-radius: 8px;
+  width: 130px;
+  height: 84px;
+  border-radius: 6px;
+  box-shadow: 
+    0 12px 25px rgba(0, 0, 0, 0.45),
+    0 6px 10px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  z-index: 3;
+}
+.physical-deck-3d:hover {
+  transform: scale(1.05) translateY(-3px);
+}
+
+/* Blue Community Chest Deck (Bottom-Left) */
+.deck-community-chest {
+  bottom: 14%;
+  left: 14%;
+  transform: rotate(-32deg);
+  background: #38bdf8;
+  border: 2px solid #0284c7;
+}
+
+/* Gold Chance Deck (Top-Right) */
+.deck-chance {
+  top: 14%;
+  right: 14%;
+  transform: rotate(-32deg);
+  background: #fbbf24;
+  border: 2px solid #d97706;
+}
+
+.deck-card-top {
+  width: 100%;
+  height: 100%;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deck-card-border {
+  width: 100%;
+  height: 100%;
+  border: 2px dashed rgba(255, 255, 255, 0.85);
+  border-radius: 4px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  padding: 6px;
-  pointer-events: none;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
-.community-chest-slot {
-  top: 15%;
-  left: 15%;
-  transform: rotate(-32deg);
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.chance-slot {
-  bottom: 15%;
-  right: 15%;
-  transform: rotate(-32deg);
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.slot-title {
+.deck-card-icon { font-size: 20px; }
+.deck-card-title {
   font-size: 0.62rem;
   font-weight: 900;
-  color: #1e293b;
-}
-.slot-subtitle {
-  font-size: 0.5rem;
-  font-weight: 800;
-  color: #64748b;
-}
-.slot-icon {
-  font-size: 18px;
-  margin-top: 2px;
+  letter-spacing: 0.5px;
 }
 
-/* Center Stage for 3D Dice and Controls */
+.deck-side-stack {
+  position: absolute;
+  bottom: -6px;
+  left: 4px;
+  right: -4px;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 0 0 4px 4px;
+  border-bottom: 2px solid #64748b;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+  z-index: -1;
+}
+
+/* Center Stage for 3D Dice */
 .center-dice-stage {
-  z-index: 5;
+  z-index: 10;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-.turn-action-bar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: rgba(255, 255, 255, 0.95);
-  border: 2px solid #0f172a;
-  border-radius: 30px;
-  padding: 6px 16px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-}
-
-.active-player-pill {
-  display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.player-avatar-circle {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  border: 2px solid #000;
-}
-
-.btn-classic-primary {
-  background: #dc2626;
-  color: #ffffff;
-  font-weight: 800;
-  padding: 8px 20px;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  border: 2px solid #000;
-  box-shadow: 0 4px 10px rgba(220, 38, 38, 0.35);
-}
-
-.btn-classic-primary:hover:not(:disabled) {
-  background: #b91c1c;
-  transform: translateY(-1px);
-}
-
-.btn-classic-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-classic-secondary {
-  background: #f1f5f9;
-  color: #0f172a;
-  font-weight: 700;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 0.85rem;
+.center-action-prompt {
+  background: rgba(255, 255, 255, 0.95);
   border: 2px solid #0f172a;
-}
-
-.walking-indicator {
-  font-weight: 800;
-  color: #0f172a;
-  font-size: 0.88rem;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  animation: pulse 1s infinite alternate;
+  border-radius: 12px;
+  padding: 8px 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  text-align: center;
 }
 
 .center-event-card-alert {
-  background: #fff;
-  border: 2px solid #000;
+  background: #ffffff;
+  border: 2px solid #0f172a;
   border-radius: 10px;
   padding: 8px 16px;
   max-width: 320px;
   text-align: center;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
 }
 
-.card-alert-header {
+.card-alert-header { font-weight: 900; font-size: 0.82rem; color: #dc2626; }
+.card-alert-desc { font-size: 0.74rem; color: #334155; margin-top: 2px; }
+
+/* ========================================================= */
+/* BOTTOM ACTION CONTROLS (ROLL BUTTON & VIEW DEEDS BINDER)  */
+/* ========================================================= */
+.bottom-controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1560px;
+  margin: 0 auto;
+  z-index: 50;
+  padding-top: 6px;
+}
+
+.bottom-left-space {
+  width: 200px;
+}
+
+/* Prominent Blue ROLL Button (Matching Image 3) */
+.btn-roblox-roll {
+  background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+  color: #ffffff;
+  font-family: var(--font-board);
+  font-size: 1.4rem;
   font-weight: 900;
-  font-size: 0.8rem;
-  color: #dc2626;
+  letter-spacing: 1px;
+  padding: 10px 42px;
+  border-radius: 40px;
+  border: 3px solid #ffffff;
+  box-shadow: 
+    0 8px 25px rgba(2, 132, 199, 0.6),
+    0 0 0 2px #0369a1,
+    inset 0 2px 4px rgba(255, 255, 255, 0.6);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
-.card-alert-desc {
-  font-size: 0.72rem;
-  color: #334155;
-  margin-top: 2px;
+.btn-roblox-roll:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 12px 30px rgba(2, 132, 199, 0.75);
+}
+
+.btn-roblox-roll:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+/* Illustrated VIEW DEEDS Button (Matching Image 3) */
+.btn-view-deeds-album {
+  background: #ffffff;
+  border: 3px solid #3b82f6;
+  border-radius: 16px;
+  padding: 6px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-view-deeds-album:hover {
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
+}
+
+.deeds-album-graphic {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.deeds-album-label {
+  font-family: var(--font-board);
+  font-size: 0.7rem;
+  font-weight: 900;
+  color: #1e3a8a;
+  letter-spacing: 0.5px;
+}
+
+/* Turn Status Indicator in Bottom Right */
+.turn-status-text {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+  margin-top: 4px;
+  text-align: right;
 }
 
 /* ========================================================= */
-/* 3D DICE SYSTEM (Real Tumbling Cubes with 6 Faces)         */
+/* 3D DICE SYSTEM                                            */
 /* ========================================================= */
 .dice-3d-arena {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  margin-top: 10px;
 }
 
 .dice-throw-tray {
@@ -756,7 +727,6 @@ body.theme-midnight .app-header {
   box-sizing: border-box;
 }
 
-/* Pip Layouts */
 .dice-face {
   width: 100%;
   height: 100%;
@@ -779,36 +749,11 @@ body.theme-midnight .app-header {
 .face-3 { display: flex; justify-content: space-between; }
 .face-3 .pip:nth-child(2) { align-self: center; }
 .face-3 .pip:nth-child(3) { align-self: flex-end; }
-.face-4 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  justify-items: center;
-  align-items: center;
-}
-.face-5 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  position: relative;
-  justify-items: center;
-  align-items: center;
-}
-.face-5 .pip:nth-child(5) {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-.face-6 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: repeat(3, 1fr);
-  justify-items: center;
-  align-items: center;
-}
+.face-4 { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; justify-items: center; align-items: center; }
+.face-5 { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; position: relative; justify-items: center; align-items: center; }
+.face-5 .pip:nth-child(5) { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+.face-6 { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); justify-items: center; align-items: center; }
 
-/* 3D Cube Faces Coordinates */
 .face-front  { transform: rotateY(0deg) translateZ(26px); }
 .face-back   { transform: rotateY(180deg) translateZ(26px); }
 .face-right  { transform: rotateY(90deg) translateZ(26px); }
@@ -828,7 +773,6 @@ body.theme-midnight .app-header {
   align-items: center;
   gap: 6px;
 }
-
 .doubles-tag {
   background: #dc2626;
   color: white;
@@ -837,9 +781,7 @@ body.theme-midnight .app-header {
   font-size: 0.65rem;
 }
 
-/* ========================================================= */
-/* PAWNS & HOPPING ANIMATION                                 */
-/* ========================================================= */
+/* Pawns */
 .tile-pawns-container {
   position: absolute;
   top: 50%;
@@ -866,79 +808,122 @@ body.theme-midnight .app-header {
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
   transition: transform 0.15s ease-out;
 }
-
 .board-pawn.is-active-player {
   border: 2.5px solid #fbbf24;
   box-shadow: 0 0 10px rgba(251, 191, 36, 0.8);
 }
-
 .board-pawn.is-hopping {
   animation: pawnHop 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-
 @keyframes pawnHop {
   0% { transform: translateY(0) scale(1); }
   50% { transform: translateY(-16px) scale(1.4); }
   100% { transform: translateY(0) scale(1); }
 }
 
-/* Modals & Sidebar Styles */
-.glass-panel {
-  background: rgba(18, 11, 7, 0.78);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(251, 191, 36, 0.2);
-  border-radius: 14px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+/* ========================================================= */
+/* DEEDS ALBUM MODAL (Gallery of All Title Deeds)            */
+/* ========================================================= */
+.deeds-album-modal {
+  max-width: 900px !important;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
-body.theme-emerald .glass-panel {
-  background: rgba(4, 25, 16, 0.78);
-  border-color: rgba(52, 211, 153, 0.2);
+.deeds-album-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 10px;
 }
 
-body.theme-midnight .glass-panel {
-  background: rgba(10, 16, 30, 0.78);
-  border-color: rgba(59, 130, 246, 0.2);
-}
-
-.glass-card {
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-}
-
-.btn-primary {
-  background: #dc2626;
-  color: white;
+.badge-filter {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.78rem;
   font-weight: 700;
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  color: #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  white-space: nowrap;
 }
-.btn-primary:hover {
-  background: #b91c1c;
-}
-
-.btn-secondary {
-  background: rgba(255, 255, 255, 0.08);
-  color: #f8fafc;
-  font-weight: 600;
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-}
-.btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.15);
+.badge-filter.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #60a5fa;
 }
 
-.btn-danger {
+.deeds-album-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+  overflow-y: auto;
+  max-height: 520px;
+  padding: 4px;
+}
+
+.mini-deed-card {
+  background: #fdfdfc;
+  border: 2px solid #0f172a;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.mini-deed-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.mini-deed-banner {
+  padding: 6px 4px;
+  text-align: center;
+  color: white;
+  border-bottom: 2px solid #0f172a;
+}
+.mini-deed-title {
+  font-family: var(--font-board);
+  font-size: 0.72rem;
+  font-weight: 900;
+  display: block;
+  text-transform: uppercase;
+}
+.mini-deed-cat {
+  font-size: 0.5rem;
+  font-weight: 700;
+  opacity: 0.85;
+}
+
+.mini-deed-body {
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.mini-deed-owner-tag {
+  margin-top: 4px;
+  font-size: 0.68rem;
+}
+
+.mini-deed-mortgaged-badge {
   background: #ef4444;
   color: white;
-  font-weight: 700;
-  padding: 8px 16px;
-  border-radius: 8px;
+  font-size: 0.55rem;
+  font-weight: 900;
+  padding: 1px 4px;
+  border-radius: 4px;
+  margin-top: 2px;
 }
 
+/* Modals */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -966,23 +951,468 @@ body.theme-midnight .glass-panel {
   gap: 14px;
 }
 
-.action-log-feed {
+.btn-classic-primary {
+  background: #dc2626;
+  color: #ffffff;
+  font-weight: 800;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  border: 2px solid #000;
+  box-shadow: 0 4px 10px rgba(220, 38, 38, 0.35);
+}
+.btn-classic-secondary {
+  background: #f1f5f9;
+  color: #0f172a;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  border: 2px solid #0f172a;
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f8fafc;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.btn-danger {
+  background: #ef4444;
+  color: white;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 8px;
+}
+
+/* ========================================================= */
+/* ROBLOX BOTTOM BAR & ACTION DOCK (Video 00:05 - 00:41)     */
+/* ========================================================= */
+.roblox-bottom-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  z-index: 50;
+  padding-top: 6px;
+}
+
+.round-pill {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #f1f5f9;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 6px 14px;
+  border-radius: 12px;
+}
+
+.roblox-action-dock {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: rgba(15, 23, 42, 0.7);
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+.dock-card-btn {
+  background: #ffffff;
+  border: 2.5px solid #0f172a;
+  border-radius: 14px;
+  padding: 8px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 86px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.dock-card-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+.dock-card-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dock-card-icon {
+  font-size: 20px;
+  line-height: 1.1;
+}
+
+.dock-card-title {
+  font-family: var(--font-board);
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: #0f172a;
+  margin-top: 2px;
+}
+
+.dock-card-sub {
+  font-size: 0.58rem;
+  font-weight: 800;
+  color: #64748b;
+  letter-spacing: 0.5px;
+}
+
+.dock-card-deeds {
+  border-color: #3b82f6;
+}
+.dock-card-deeds .dock-card-title {
+  color: #1e3a8a;
+}
+
+.dock-card-roll {
+  background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+  border-color: #ffffff;
+  color: #ffffff;
+  min-width: 96px;
+}
+.dock-card-roll .dock-card-title,
+.dock-card-roll .dock-card-sub {
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.dock-card-endturn {
+  background: linear-gradient(180deg, #34d399 0%, #059669 100%);
+  border-color: #ffffff;
+  min-width: 96px;
+}
+.dock-card-endturn .dock-card-title,
+.dock-card-endturn .dock-card-sub {
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.bottom-right-status {
+  text-align: right;
+  min-width: 180px;
+}
+.turn-status-text {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #cbd5e1;
+}
+.turn-player-text {
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+}
+
+/* 3-Column Deeds & Trading Modal Layout */
+.roblox-deeds-modal,
+.roblox-trade-modal {
+  max-width: 860px !important;
+  max-height: 88vh;
+  padding: 16px 20px;
+  background: #182032 !important;
+}
+
+.roblox-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 8px;
+}
+.roblox-modal-title {
+  font-family: var(--font-board);
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #f8fafc;
+}
+.roblox-close-btn {
+  background: #ef4444;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+}
+
+.roblox-deeds-layout,
+.roblox-trading-grid {
+  display: grid;
+  grid-template-columns: 220px 1fr 180px;
+  gap: 14px;
+  margin-top: 10px;
+}
+.roblox-trading-grid {
+  grid-template-columns: 220px 1fr 1fr;
+}
+
+.roblox-col-label {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #f1f5f9;
+  margin-bottom: 4px;
+}
+.preview-instruction {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  margin-bottom: 8px;
+}
+
+/* Real Title Deed Card (Video 00:18, 00:48) */
+.classic-title-deed-card {
+  background: #ffffff;
+  border: 2px solid #000;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+  font-family: var(--font-board);
+}
+.deed-header-bar {
+  padding: 8px 6px;
+  text-align: center;
+  color: white;
+  border-bottom: 2px solid #000;
+}
+.deed-header-sub { font-size: 0.52rem; font-weight: 800; letter-spacing: 1px; }
+.deed-header-name { font-size: 0.95rem; font-weight: 900; line-height: 1.1; margin: 2px 0; }
+.deed-header-cat { font-size: 0.55rem; font-weight: 700; opacity: 0.9; }
+
+.deed-rent-table {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.72rem;
+  color: #0f172a;
+}
+.rent-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 2px;
+}
+.highlight-flagship {
+  background: rgba(245, 158, 11, 0.15);
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-weight: 900;
+}
+.deed-footer-stats {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid #cbd5e1;
+  font-size: 0.65rem;
+  color: #475569;
+  text-align: center;
+}
+
+/* Owned Props Grid */
+.owned-props-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 8px;
+  max-height: 380px;
+  overflow-y: auto;
+  padding: 4px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+}
+.owned-prop-thumb {
+  background: #ffffff;
+  border: 1.5px solid #000;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.owned-prop-thumb:hover {
+  transform: translateY(-2px);
+}
+.thumb-color-bar {
+  padding: 4px 2px;
+  color: white;
+  text-align: center;
+}
+.thumb-name {
+  font-size: 0.65rem;
+  font-weight: 900;
+  display: block;
+}
+.thumb-details {
+  padding: 4px;
+  font-size: 0.65rem;
+  color: #0f172a;
+  font-weight: 700;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.no-props-message {
+  grid-column: 1 / -1;
+  padding: 20px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.8rem;
+}
+
+/* Select Player List */
+.select-player-list {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  max-height: 200px;
-  overflow-y: auto;
-  padding: 8px;
-  background: rgba(0, 0, 0, 0.45);
+}
+.player-select-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
   border-radius: 8px;
-  font-size: 0.78rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.player-select-item.active {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+}
+.player-select-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1.5px solid white;
+}
+.player-select-name {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+.player-select-count {
+  font-size: 0.68rem;
+  color: #94a3b8;
 }
 
-.log-item {
-  padding: 4px 8px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.03);
+/* Trading Box */
+.roblox-trade-box {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.trade-box-title {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #f8fafc;
+}
+.trade-sub-label {
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+.trade-props-list {
+  max-height: 200px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.trade-prop-item {
   display: flex;
   align-items: center;
   gap: 6px;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  cursor: pointer;
 }
+.trade-prop-item.selected {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: #22c55e;
+}
+.prop-mini-color {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+.trade-empty-msg {
+  font-size: 0.72rem;
+  color: #64748b;
+  padding: 8px 0;
+}
+
+.trade-money-row {
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.trade-money-input {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: #34d399;
+  font-weight: 800;
+  padding: 4px 8px;
+  width: 90px;
+  font-size: 0.85rem;
+}
+.btn-max {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+.btn-max:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.btn-roblox-send-proposal {
+  background: #16a34a;
+  color: white;
+  font-family: var(--font-board);
+  font-size: 1.1rem;
+  font-weight: 900;
+  padding: 10px 36px;
+  border-radius: 24px;
+  border: 2px solid white;
+  box-shadow: 0 4px 15px rgba(22, 163, 74, 0.5);
+}
+.btn-roblox-send-proposal:hover:not(:disabled) {
+  background: #15803d;
+  transform: translateY(-2px);
+}
+.btn-roblox-send-proposal:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.roblox-select {
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-weight: 700;
+  font-size: 0.82rem;
+}
+
